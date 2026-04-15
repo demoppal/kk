@@ -2,36 +2,39 @@ import os
 import sys
 import requests
 
-# Pydroid ရဲ့ လုံခြုံတဲ့ Internal Path ထဲကို အရင်ဝင်မယ်
+# Pydroid Internal Folder ထဲသွားမယ်
 home = os.path.expanduser("~")
 os.chdir(home)
 
-# GitHub က ဖိုင်အသစ် (qq.pyc) ရဲ့ Link
-URL_PYC = "https://raw.githubusercontent.com/demoppal/kk/main/qq.pyc"
-# အရင်က တင်ထားတဲ့ qq.so ရဲ့ Link (Link အမှန်ကို ပြန်ထည့်ပေးပါ)
+# GitHub Links
+# ဖိုင်နာမည်ကို GitHub ကအတိုင်း တိတိကျကျ ရေးထားပါတယ်
+URL_PYC = "https://raw.githubusercontent.com/demoppal/kk/main/qq.cpython-313.pyc"
 URL_SO = "https://raw.githubusercontent.com/demoppal/kk/main/qq.so"
 
-def download_updates():
-    # qq.pyc ကို အမြဲ update ဖြစ်အောင် အရင်ဖျက်ပြီး ပြန်ဒေါင်းတာ ပိုစိတ်ချရပါတယ်
-    for file in ["qq.pyc", "qq.so"]:
-        if not os.path.exists(file):
-            print(f"[-] {file} ကို ရယူနေပါသည်...")
-            r = requests.get(URL_PYC if ".pyc" in file else URL_SO)
-            with open(file, "wb") as f:
+def setup():
+    # .pyc ဖိုင်ကို ဒေါင်းပြီး qq.pyc လို့ နာမည်ပြောင်းသိမ်းမယ်
+    if not os.path.exists("qq.pyc"):
+        print("[-] qq.pyc ကို ရယူနေပါသည်...")
+        r = requests.get(URL_PYC)
+        with open("qq.pyc", "wb") as f:
+            f.write(r.content)
+            
+    # .so ဖိုင်ကို ဒေါင်းမယ်
+    if not os.path.exists("qq.so"):
+        print("[-] qq.so ကို ရယူနေပါသည်...")
+        r = requests.get(URL_SO)
+        if r.status_code == 200:
+            with open("qq.so", "wb") as f:
                 f.write(r.content)
-    print("[+] ဖိုင်များ ပြည့်စုံပါပြီ။")
 
 def start():
-    download_updates()
-    print("\n[*] Script စတင်နေပါပြီ...")
-    print("=" * 20)
+    setup()
+    print("[+] Files အားလုံး အဆင်သင့်ဖြစ်ပါပြီ။")
+    print("[*] Script စတင်နေပါပြီ...\n" + "="*20)
     
     try:
-        if home not in sys.path:
-            sys.path.append(home)
-        
-        # ဤနေရာတွင် qq.pyc ရော qq.so ကိုပါ Python က ရှာဖွေသွားပါလိမ့်မယ်
-        import qq
+        sys.path.append(home)
+        import qq # qq.pyc ကို လှမ်းခေါ်ပါပြီ
     except Exception as e:
         print(f"[!] Error: {e}")
 
