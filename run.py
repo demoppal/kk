@@ -2,37 +2,39 @@ import os
 import sys
 import requests
 
-# ၁။ Pydroid ရဲ့ လုံခြုံတဲ့ Internal Folder ထဲသို့ အရင်သွားမယ်
+# Pydroid ရဲ့ လုံခြုံတဲ့ Internal Path ထဲကို အရင်ဝင်မယ်
 home = os.path.expanduser("~")
 os.chdir(home)
 
-# ၂။ GitHub က ဖိုင်လမ်းကြောင်း
-URL = "https://raw.githubusercontent.com/demoppal/kk/main/qq.pyc"
-FILE = "qq.pyc"
+# GitHub က ဖိုင်အသစ် (qq.pyc) ရဲ့ Link
+URL_PYC = "https://raw.githubusercontent.com/demoppal/kk/main/qq.pyc"
+# အရင်က တင်ထားတဲ့ qq.so ရဲ့ Link (Link အမှန်ကို ပြန်ထည့်ပေးပါ)
+URL_SO = "https://raw.githubusercontent.com/demoppal/kk/main/qq.so"
+
+def download_updates():
+    # qq.pyc ကို အမြဲ update ဖြစ်အောင် အရင်ဖျက်ပြီး ပြန်ဒေါင်းတာ ပိုစိတ်ချရပါတယ်
+    for file in ["qq.pyc", "qq.so"]:
+        if not os.path.exists(file):
+            print(f"[-] {file} ကို ရယူနေပါသည်...")
+            r = requests.get(URL_PYC if ".pyc" in file else URL_SO)
+            with open(file, "wb") as f:
+                f.write(r.content)
+    print("[+] ဖိုင်များ ပြည့်စုံပါပြီ။")
 
 def start():
-    # ဖိုင်မရှိရင် ဒေါင်းမယ်
-    if not os.path.exists(FILE):
-        print("[-] File ကို GitHub မှ ရယူနေပါသည်...")
-        r = requests.get(URL)
-        with open(FILE, "wb") as f:
-            f.write(r.content)
-        print("[+] ဒေါင်းလုဒ် ပြီးပါပြီ။")
-
-    # ၃။ Import လုပ်ပြီး Run မည့်အပိုင်း
-    print("[*] Script စတင်နေပါပြီ...")
-    print("-" * 20)
+    download_updates()
+    print("\n[*] Script စတင်နေပါပြီ...")
+    print("=" * 20)
     
     try:
-        # လက်ရှိ folder ထဲက qq.pyc ကို ရှာတွေ့အောင် path ထည့်ပေးခြင်း
-        sys.path.append(home)
+        if home not in sys.path:
+            sys.path.append(home)
         
-        # qq.pyc ကို ခေါ်သုံးခြင်း
+        # ဤနေရာတွင် qq.pyc ရော qq.so ကိုပါ Python က ရှာဖွေသွားပါလိမ့်မယ်
         import qq
-        
     except Exception as e:
-        print(f"[!] Error တက်သွားသည်: {e}")
+        print(f"[!] Error: {e}")
 
 if __name__ == "__main__":
     start()
-  
+    
